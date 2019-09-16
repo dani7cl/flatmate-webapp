@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <div class="panel">
-      <Roulette v-bind:spin="rouletteSpin" />
+      <Roulette ref="roulette" />
       <Legend />
     </div>
     <button class="play-button" v-on:click="play()">PLAY</button>
@@ -20,9 +20,8 @@ import Legend from "./components/Legend.vue";
   }
 })
 export default class App extends Vue {
-  rouletteSpin = false;
-  play() {
-    this.rouletteSpin = true;
+  public play() {
+    (this.$refs.roulette as Roulette).startSpinning();
   }
 }
 </script>

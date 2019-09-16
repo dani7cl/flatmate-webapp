@@ -1,7 +1,7 @@
 <template>
   <div class="roulette">
     <div class="pie">
-      <div v-bind:class="{'animated':spin}">
+      <div class="spinner" ref="spinner">
         <div class="segment"></div>
         <div class="segment"></div>
         <div class="segment"></div>
@@ -15,11 +15,42 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from "vue-property-decorator";
+import { Component, Vue } from "vue-property-decorator";
 
 @Component
 export default class Roulette extends Vue {
-  @Prop() spin = false;
+  private intervalRef: number = 0;
+
+  public startSpinning() {
+    const draw = (progress: number) => {
+      (this.$refs.spinner as any).style.transform =
+        "rotate(" + progress * 360 + "deg)";
+    };
+    this.animate({
+      loopTime: 500,
+      maxDuration: 2750,
+      draw
+    });
+  }
+
+  private animate({
+    draw,
+    loopTime,
+    maxDuration
+  }: {
+    draw: (progress: number) => void;
+    loopTime: number;
+    maxDuration: number;
+  }) {
+    const start = performance.now();
+    requestAnimationFrame(function animate(time) {
+      const progress = (time - start) / loopTime;
+      if (time - start < maxDuration) {
+        draw(progress);
+        requestAnimationFrame(animate);
+      }
+    });
+  }
 }
 </script>
 
@@ -34,10 +65,10 @@ export default class Roulette extends Vue {
   background: #d1cfc0;
   position: relative;
   overflow: hidden;
-  .animated {
+  .spinner {
     width: 100%;
     height: 100%;
-    animation: rotate 1s infinite linear;
+    transition: transform 0.5s linear;
   }
 }
 .segment {
